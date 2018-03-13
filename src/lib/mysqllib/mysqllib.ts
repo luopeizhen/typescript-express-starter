@@ -1,26 +1,25 @@
 
-//transaction写错了, 还没时间改
 
-//
-//2017-12-05 fix: compile error
-//2017-11-21 fix: makeWhere array string\
-//2017-07-13 fix: toUpdateStr not replace \
-//2017-07-7 add: addObj, setObj
-//2017-06-27 fix: DbConnection.query get wrong this(not use ()=>)
-//2017-06-27 add: raw value to set
-//2017-04-06 change: makeXXx no sort now
-//2017-03-15 add: where support array value
-//2017-03-01 fix: forget escape \ in string
-
-//
-//2016-12-24 fix: p_update use insert sql
-//2016-12-01 fix: p_insert, p_update, p_delete no parameter
 
 import * as mysql from "mysql";
-//import { QueryBuilder } from "./query_builder";
 
-//let mysql = require('mysql');
-//let printf = require('printf');
+
+/*
+//获取数量
+let qb = new mysqllib.QueryBuilder('t1')
+qb.fields("count(*) as num")
+let totalCount = (await mysqllib.getDefDb().findOne<{num:number}>(qb)).num;
+
+//获取某一页
+let page = 5;
+let qb = new mysqllib.QueryBuilder('t1')
+qb.limit(page * 20, 20), //第5页, 每页20个
+let items = (await mysqllib.getDefDb().findOne<any>(qb));
+*/
+
+
+
+
 
 export const DB_DEFAULT = 'default';
 
@@ -44,7 +43,7 @@ class DbConnection {
 
     }
 
-    getValidConn() : mysql.IConnection|mysql.IPool{
+    getValidConn(): mysql.IConnection | mysql.IPool {
         if (this.transactionConn && this.transactionConn != null) {
             return this.transactionConn;
         }
@@ -146,27 +145,27 @@ class DbConnection {
             });
         });
     }
-    
+
     async commit(): Promise<any> {
         return new Promise<any>((resolve, reject) => {
             this.transactionConn.commit(() => {
-                //this.transactionConn = null;
+                this.transactionConn.release();
                 resolve();
             });
         });
     }
-    
+
     async rollback(): Promise<any> {
         return new Promise<any>((resolve, reject) => {
             this.transactionConn.rollback(() => {
-                //this.transactionConn = null;
+                this.transactionConn.release();
                 resolve();
             });
         });
     }
 }
 
-export function getDb(name: string) : DbConnection {
+export function getDb(name: string): DbConnection {
     const rs = DbConnMap.get(name)
     if (!rs) {
         throw new Error(`DBConnection not found, name:${name}`)
@@ -174,7 +173,7 @@ export function getDb(name: string) : DbConnection {
     return rs
 }
 
-export function getDefDb() : DbConnection{
+export function getDefDb(): DbConnection {
     return getDb(DB_DEFAULT);
 }
 
