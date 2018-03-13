@@ -13,7 +13,7 @@ let totalCount = (await mysqllib.getDefDb().findOne<{num:number}>(qb)).num;
 //获取某一页
 let page = 5;
 let qb = new mysqllib.QueryBuilder('t1')
-qb.limit(page * 20, 20), //第5页, 每页20个
+qb.limit(page * 20, 20) //第5页, 每页20个
 let items = (await mysqllib.getDefDb().findOne<any>(qb));
 */
 
